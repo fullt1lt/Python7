@@ -12,7 +12,7 @@ class ChessPiece:
         return len([number for number in new_place if 0 <= number <= 7]) == 2
 
     def _set_place(self, new_place: tuple)-> None:
-        if self.cheking_for_board_limits(new_place) == True:
+        if self.cheking_for_board_limits(new_place):
             self.place = new_place
         else:
             print(f"You can't put the piece in place {new_place}")
@@ -20,46 +20,185 @@ class ChessPiece:
     def ceck_move(self)-> None:
         raise NotImplementedError
     
-test = ChessPiece()
-
-test._set_place((5,2))
-print(test.place)
-
-
 class Pawn(ChessPiece):
-
+    name: str = "Pawn"
     def __cheking_for_board_limits(self,move):
         return super().cheking_for_board_limits(move)
     
-    def __move_condition(self)->tuple:
+    def __move_condition(self)->list:
+        all_moves = []
         if self.color == "White":
-            return (self.place[0], self.place[1] + 1)
+            all_moves.append((self.place[0], self.place[1] + 1))
+            return all_moves
         else:
-            return (self.place[0], self.place[1] - 1)
+            all_moves.append((self.place[0], self.place[1] - 1))
+            return all_moves
 
-    def ceck_move(self, move: tuple)-> None:
-        if self.__cheking_for_board_limits(move) == True and self.__move_condition() == move:
-                print(f"This move {move} is possible")
-                self._set_place(move)
-        else:
-            print(f"This move {move} is impossible")
+    def ceck_move(self, move: tuple)-> bool:
+        return self.__cheking_for_board_limits(move) and move in self.__move_condition()
+
+class Officer(ChessPiece):
+    name: str = "Officer"
+    def __cheking_for_board_limits(self,move) -> bool:
+        return super().cheking_for_board_limits(move)
+    
+    def __move_condition(self)->list:
+        x, y = self.place
+        all_moves = []
+        # diagonal moves
+        for i in range(1, 8):
+            if x + i <= 7 and y + i <= 7:
+                all_moves.append((x + i, y + i))  # right down
+            if x - i >= 0 and y - i >= 0:
+                all_moves.append((x - i, y - i))  # left up
+            if x + i <= 7 and y - i >= 0:
+                all_moves.append((x + i, y - i))  # right up
+            if x - i >= 0 and y + i <= 7:
+                all_moves.append((x - i, y + i))  # left down
+        return all_moves
+        
+    def ceck_move(self, move: tuple)-> bool:
+        return self.__cheking_for_board_limits(move) and move in self.__move_condition()
+
+class Queen(ChessPiece):
+    name: str = "Queen"
+    def __cheking_for_board_limits(self,move) -> bool:
+        return super().cheking_for_board_limits(move)
+    
+    def __move_condition(self)->list:
+        x, y = self.place
+        all_moves = []
+        # diagonal moves
+        for i in range(1, 8):
+            if x + i <= 7 and y + i <= 7:
+                all_moves.append((x + i, y + i))  # right down
+            if x - i >= 0 and y - i >= 0:
+                all_moves.append((x - i, y - i))  # left up
+            if x + i <= 7 and y - i >= 0:
+                all_moves.append((x + i, y - i))  # right up
+            if x - i >= 0 and y + i <= 7:
+                all_moves.append((x - i, y + i))  # left down
+        # moves up and down
+        for i in range(1, 8):
+            if y + i <= 7:
+                all_moves.append((x, y + i))  # up
+            if y - i >= 0:
+                all_moves.append((x, y - i))  # down
+        # moves left and right
+        for i in range(1, 8):
+            if x + i <= 7:
+                all_moves.append((x + i, y))  # right
+            if x - i >= 0:
+                all_moves.append((x - i, y))  # left
+        return all_moves
+        
+    def ceck_move(self, move: tuple)-> bool:
+        return self.__cheking_for_board_limits(move) and move in self.__move_condition()
+
+class Rook(ChessPiece):
+    name: str = "Rook"
+    def __cheking_for_board_limits(self,move) -> bool:
+        return super().cheking_for_board_limits(move)
+    
+    def __move_condition(self)->list:
+        x, y = self.place
+        all_moves = []
+        # moves up and down
+        for i in range(1, 8):
+            if y + i <= 7:
+                all_moves.append((x, y + i))  # up
+            if y - i >= 0:
+                all_moves.append((x, y - i))  # down
+        # moves left and right
+        for i in range(1, 8):
+            if x + i <= 7:
+                all_moves.append((x + i, y))  # right
+            if x - i >= 0:
+                all_moves.append((x - i, y))  # left
+        return all_moves
+        
+    def ceck_move(self, move: tuple)-> bool:
+        return self.__cheking_for_board_limits(move) and move in self.__move_condition()
 
 
+class King(ChessPiece):
+    name: str = "King"
+    def __cheking_for_board_limits(self,move) -> bool:
+        return super().cheking_for_board_limits(move)
+    
+    def __move_condition(self)->list:
+        x, y = self.place
+        all_moves = []
+        # diagonal moves
+        for i in range(1, 2):
+            if x + i <= 7 and y + i <= 7:
+                all_moves.append((x + i, y + i))  # right down
+            if x - i >= 0 and y - i >= 0:
+                all_moves.append((x - i, y - i))  # left up
+            if x + i <= 7 and y - i >= 0:
+                all_moves.append((x + i, y - i))  # right up
+            if x - i >= 0 and y + i <= 7:
+                all_moves.append((x - i, y + i))  # left down
+        # moves up and down
+        for i in range(1, 2):
+            if y + i <= 7:
+                all_moves.append((x, y + i))  # up
+            if y - i >= 0:
+                all_moves.append((x, y - i))  # down
+        # moves left and right
+        for i in range(1, 2):
+            if x + i <= 7:
+                all_moves.append((x + i, y))  # right
+            if x - i >= 0:
+                all_moves.append((x - i, y))  # left
+        return all_moves
+        
+    def ceck_move(self, move: tuple)-> bool:
+        return self.__cheking_for_board_limits(move) and move in self.__move_condition()
 
-# white_pawn = Pawn()
-# white_pawn.ceck_move((0,1))
-# print(white_pawn.place)
-# white_pawn.ceck_move((0,3))
-# print(white_pawn.place)
+class Horse(ChessPiece):
+    name: str = "Horse"
+    def __cheking_for_board_limits(self,move) -> bool:
+        return super().cheking_for_board_limits(move)
+    
+    def __move_condition(self)->list:
+        x, y = self.place
+        all_moves = []
+        # moves horse 
+        if x + 2 <= 7 and y + 1 <= 7:
+            all_moves.append((x + 2, y + 1))  # right up
+        if x - 2 >= 0 and y + 1 <= 7:
+            all_moves.append((x - 2, y + 1))  # left up
+        if x + 2 <= 7 and y - 1 >= 0:
+            all_moves.append((x + 2, y - 1))  # right down
+        if x - 2 >= 0 and y - 1 >= 0:
+            all_moves.append((x - 2, y - 1))  # left down
+        if x + 1 <= 7 and y + 2 <= 7:
+            all_moves.append((x + 1, y + 2))  # up right
+        if x - 1 >= 0 and y + 2 <= 7:
+            all_moves.append((x - 1, y + 2))  # up left
+        if x + 1 <= 7 and y - 2 >= 0:
+            all_moves.append((x + 1, y - 2))  # down right
+        if x - 1 >= 0 and y - 2 >= 0:
+            all_moves.append((x - 1, y - 2))  # down left
+        return all_moves
+        
+    def ceck_move(self, move: tuple)-> bool:
+        return self.__cheking_for_board_limits(move) and move in self.__move_condition()
 
+chess_piece = ChessPiece()
+white_pawn = Pawn()
 black_pawn = Pawn()
 black_pawn.set_color()
-black_pawn._set_place((5,5))
-print(black_pawn.place)
-black_pawn.ceck_move((5,4))
-black_pawn.ceck_move((5,3))
-black_pawn.ceck_move((5,2))
-black_pawn.ceck_move((5,1))
-black_pawn.ceck_move((5,0))
-black_pawn.ceck_move((5,-1))
+officer = Officer()
+queen = Queen()
+rook = Rook()
+king = King()
+horse = Horse()
+сhess_pieces = [white_pawn,black_pawn,officer,queen,rook,king,horse]
+move = (3,3)
 
+def sorting_shapes(сhess_pieces: list, move: tuple ) -> list:
+    return [f'{piece.name}' for piece in сhess_pieces if piece.ceck_move(move)]
+
+print(f"Move from place {chess_piece.place} to place {move} can be done: {sorting_shapes(сhess_pieces, move)}")
