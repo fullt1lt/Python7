@@ -3,15 +3,7 @@ MODE_HARD = 'Hard'
 MODES = {'1': MODE_NORMAL,
          '2': MODE_HARD}
 
-LIVES_ENEMY = {
-    1 : 5,
-    2 : 6,
-    3 : 7,
-    4 : 8,
-    5 : 9
-}
-
-
+LIVES_ENEMY = 5
 PLAYER_LIVES = 5
 POINTS_FOR_FIGHT = 1
 POINTS_FOR_KILLING = 5

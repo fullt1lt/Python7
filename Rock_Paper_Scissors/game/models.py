@@ -7,16 +7,15 @@ class Player:
     lives: int
     scores: int = 0
 
-    def __init__(self,user_name : str,player_lives : int) -> None:
+    def __init__(self,user_name : str) -> None:
         self.name = user_name
-        self.lives = player_lives
+        self.lives = settings.PLAYER_LIVES
 
     def select_attack (self):
         while True:
             try:
-                attack = input("Make a move: 1 or 2 or 3")
-                if attack in settings.ALLOWED_ATTACKS:
-                    return  settings.ALLOWED_ATTACKS[attack]
+                attack = input("Make a move: 1 - Paper or 2 - Stone or 3 - Scissors... ")
+                return  settings.ALLOWED_ATTACKS[attack]
             except KeyError:
                 print("Incorrect move entered")
 
@@ -35,12 +34,12 @@ class Enemy:
 
     def __init__(self, enemy_level: int) -> None:
         self.level = enemy_level
-        self.lives = settings.LIVES_ENEMY[enemy_level]
+        self.lives = settings.LIVES_ENEMY + enemy_level
 
-    def select_atack(self):
+    def select_attack(self):
         return settings.ALLOWED_ATTACKS[str(randint(1,3))]
 
-    def reduction_of_lives(self):
+    def decrease_lives (self):
         self.lives -= 1
         if self.lives == 0:
             raise EnemyDown()
