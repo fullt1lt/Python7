@@ -1,0 +1,3 @@
+John,normal,400
+John,hard,300
+John1,normal,300
