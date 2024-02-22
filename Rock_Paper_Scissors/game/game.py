@@ -1,6 +1,7 @@
-import models
-import settings
-from exeptions import GameOver,EnemyDown
+from game import models
+from game import settings
+from game import scores
+from game import exeptions
 
 class Game:
     player: object
@@ -8,7 +9,7 @@ class Game:
     mode: int
     level_enemy: int = 0 
 
-    def __init__(self,player: object,mode: int) -> None:
+    def __init__(self,player: object,mode: str) -> None:
         self.player = player
         self.mode = mode
         self.enemy = models.Enemy(self.level_enemy)
@@ -16,19 +17,23 @@ class Game:
     def create_enemy(self,level_enemy: int)-> None:
         self.enemy = models.Enemy(level_enemy)
 
-    def play(self):
+    def play(self)-> None:
         while True:
-            print(f"{self.player.lives} - {self.enemy.lives} {self.player.name} = {self.player.scores}")
+            print(f"{self.player.name} - Enemy Level-{self.enemy.level}")
+            print(f" {self.player.lives} - {self.enemy.lives}")
             result_of_the_fight = self.fight()# метод боя 
             try:
                 self.handle_fight_result(result_of_the_fight)
-            except GameOver:
-                print("Game Over - You losse")
+            except exeptions.GameOver:
+                handler = scores.ScoreHandler()
+                handler.game_record.add_record(scores.PlayerRecord(self.player.name,self.mode,self.player.scores))
+                handler.save()
+                print("Game Over - You losse:(")
+                print(f"{self.player.name} your scores - {self.player.scores}")
                 break
-            except EnemyDown:
+            except exeptions.EnemyDown:
                 self.create_enemy(self.level_enemy + 1)
                 self.player.add_score(settings.POINTS_FOR_KILLING)
-
 
     def fight(self) -> int:
         player_move = self.player.select_attack()
@@ -43,10 +48,3 @@ class Game:
             self.player.decrease_lives()
         else:
             print("DRAW")
-
-
-        
-player1 = models.Player("Test")
-game = Game(player1, 1)
-
-print(game.play())

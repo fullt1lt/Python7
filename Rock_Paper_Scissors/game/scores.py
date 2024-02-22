@@ -1,71 +1,61 @@
+from game import settings
+
 class PlayerRecord:
-    def __init__(self, name, mode, score):
+    def __init__(self, name:str, mode:str, score:int)-> None:
         self.name = name
         self.mode = mode
         self.score = score
 
-    def __eq__(self, other):
+    def __eq__(self, other)-> bool:
         return self.name == other.name and self.mode == other.mode
 
-    def __gt__(self, other):
+    def __gt__(self, other)-> bool:
         return self.score > other.score
 
-    # def __str__(self):
-    #     return f"PlayerRecord(name={self.name}, mode={self.mode}, score={self.score})"
+    def __str__(self)-> str:
+        return f"{self.name} {self.mode} {self.score}"
 
 
 class GameRecord:
-    def __init__(self):
+    def __init__(self)->None:
         self.records = []
 
-    def add_record(self, player_record):
+    def add_record(self, player_record:object)-> None:
         for existing_record in self.records:
             if existing_record == player_record:
-                if player_record.score > existing_record.score:
-                    existing_record.score = player_record.score
-                break
-        else:
-            self.records.append(player_record)
+                existing_record.score = max(existing_record.score, player_record.score)
+                return
+        self.records.append(player_record)
 
-    def prepare_records(self, max_records):
+    def prepare_records(self)-> None:
         self.records.sort(reverse=True)
-        self.records = self.records[:max_records]
+        self.records = self.records[:settings.MAX_RECORDS_NUMBER]
 
 
 class ScoreHandler:
-    def __init__(self, file_name):
+    def __init__(self)->None:
         self.game_record = GameRecord()
-        self.file_name = file_name
+        self.file_name = settings.SCORE_FILE
         self.read()
 
-    def read(self):
+    def read(self)->None:
         try:
             with open(self.file_name, 'r') as file:
                 for line in file:
                     data = line.strip().split(',')
                     name, mode, score = data[0], data[1], int(data[2])
-                    player_record = PlayerRecord(name, mode, score)
-                    self.game_record.add_record(player_record)
+                    self.game_record.add_record(PlayerRecord(name, mode, score))
         except FileNotFoundError:
-            print(f"File {self.file_name} not found.")
+            open(self.file_name, "w").close()
+        except IndexError:
+            self.game_record.add_record(PlayerRecord("", "", 0))
 
-    def save(self):
-        self.game_record.prepare_records(10)  # Пример: ограничиваем до 10 лучших результатов
+    def save(self)->None:
+        self.game_record.prepare_records()
         with open(self.file_name, 'w') as file:
             for record in self.game_record.records:
                 file.write(f"{record.name},{record.mode},{record.score}\n")
 
-    def display(self):
+    def display(self)->None:
         for record in self.game_record.records:
-            print(f"{record.name} {record.mode} {record.score}")
-
-
-# Пример использования
-handler = ScoreHandler("scores.txt")
-new_record = PlayerRecord("John", "normal", 400)
-handler.game_record.add_record(new_record)
-handler.save()
-new_record = PlayerRecord("John1", "normal", 300)
-handler.game_record.add_record(new_record)
-handler.save()
-handler.display()
+            print(f"{record}")

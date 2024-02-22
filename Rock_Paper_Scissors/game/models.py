@@ -1,15 +1,19 @@
-import settings
+from game import settings
 from random import randint
-from exeptions import GameOver,EnemyDown
+from game import exeptions
 
 class Player:
     name: str
     lives: int
     scores: int = 0
 
-    def __init__(self,user_name : str) -> None:
+    def __init__(self,user_name : str, mode : str) -> None:
         self.name = user_name
-        self.lives = settings.PLAYER_LIVES
+        if mode == settings.MODE_NORMAL:
+            self.lives = settings.PLAYER_LIVES
+        else:
+            self.lives = settings.PLAYER_LIVES_FOR_MODE_HARD
+
 
     def select_attack (self):
         while True:
@@ -19,19 +23,16 @@ class Player:
             except KeyError:
                 print("Incorrect move entered")
 
-
     def add_score (self, scrores: int)-> None:
         self.scores += scrores
 
     def decrease_lives (self)-> None:
         self.lives -= 1
         if self.lives == 0:
-            raise GameOver()
+            raise exeptions.GameOver()
+
 
 class Enemy:
-    lives: int
-    level: int
-
     def __init__(self, enemy_level: int) -> None:
         self.level = enemy_level
         self.lives = settings.LIVES_ENEMY + enemy_level
@@ -42,4 +43,4 @@ class Enemy:
     def decrease_lives (self):
         self.lives -= 1
         if self.lives == 0:
-            raise EnemyDown()
+            raise exeptions.EnemyDown()
