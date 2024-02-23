@@ -17,10 +17,9 @@ class PlayerRecord:
 
 
 class GameRecord:
-    def __init__(self)->None:
-        self.records = []
+    records: list[PlayerRecord] = []
 
-    def add_record(self, player_record:object)-> None:
+    def add_record(self, player_record:PlayerRecord)-> None:
         for existing_record in self.records:
             if existing_record == player_record:
                 existing_record.score = max(existing_record.score, player_record.score)
@@ -48,7 +47,7 @@ class ScoreHandler:
         except FileNotFoundError:
             open(self.file_name, "w").close()
         except IndexError:
-            self.game_record.add_record(PlayerRecord("", "", 0))
+            self.game_record.add_record(PlayerRecord())
 
     def save(self)->None:
         self.game_record.prepare_records()

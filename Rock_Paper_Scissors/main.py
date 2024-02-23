@@ -5,7 +5,7 @@ def create_player()-> tuple:
     name = input("Enter your name.. ")
     while True:
         try:
-            mode = settings.MODES[input("Select the game mode: 1 - Normal, 2 - Hard")]
+            mode = settings.MODES[input("Select the game mode: 1 - Normal, 2 - Hard  ")]
             player = models.Player(name,mode)
             return player, mode
         except KeyError:

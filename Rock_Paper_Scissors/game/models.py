@@ -29,13 +29,16 @@ class Player:
     def decrease_lives (self)-> None:
         self.lives -= 1
         if self.lives == 0:
-            raise exeptions.GameOver()
+            raise exeptions.GameOver
 
 
 class Enemy:
-    def __init__(self, enemy_level: int) -> None:
+    def __init__(self, enemy_level: int, mode : str) -> None:
         self.level = enemy_level
-        self.lives = settings.LIVES_ENEMY + enemy_level
+        if mode == settings.MODE_NORMAL:
+            self.lives = settings.ENEMY_LIVES + enemy_level
+        else:
+            self.lives = settings.ENEMY_LIVES_FOR_MODE_HARD + enemy_level
 
     def select_attack(self):
         return settings.ALLOWED_ATTACKS[str(randint(1,3))]
@@ -43,4 +46,4 @@ class Enemy:
     def decrease_lives (self):
         self.lives -= 1
         if self.lives == 0:
-            raise exeptions.EnemyDown()
+            raise exeptions.EnemyDown

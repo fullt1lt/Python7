@@ -1,3 +1,2 @@
-Daniil,Hard,22
-Kate,Hard,11
-Daniil,Normal,10
+Daniil,Normal,13
+Daniil,Hard,11
