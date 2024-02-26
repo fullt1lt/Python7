@@ -1,0 +1,5 @@
+Test,Hard,28
+Daniil,Normal,13
+Daniil,Hard,11
+Player1,Normal,2
+Player1,Hard,0
