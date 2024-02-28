@@ -13,7 +13,7 @@ class Player:
         validate_mode(mode)
         if mode == MODE_NORMAL:
             self.lives = PLAYER_LIVES
-        elif mode == MODE_HARD:
+        else:
             self.lives = PLAYER_LIVES_FOR_MODE_HARD
 
 
