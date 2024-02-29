@@ -44,6 +44,9 @@ class Enemy:
         else:
             self.lives = ENEMY_LIVES_FOR_MODE_HARD + enemy_level
 
+    def __eq__(self, other) -> bool:
+        return self.level == other.level and self.lives == other.lives
+
     def select_attack(self):
         return ALLOWED_ATTACKS[str(randint(MIN_ATTACK_VALUE,MAX_ATTACK_VALUE))]
 
