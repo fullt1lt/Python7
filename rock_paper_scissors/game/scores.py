@@ -1,16 +1,19 @@
 from game.settings import MAX_RECORDS_NUMBER, SCORE_FILE
 from game.models import Player
+from game.validations import validate_mode
+import os
+
 
 class PlayerRecord:
     def __init__(self, name:str, mode:str, score:int) -> None:
         self.name = name
+        validate_mode(mode)
         self.mode = mode
         self.score = score
 
     @classmethod
     def from_player_and_mode(cls, player: Player, mode : str) -> "PlayerRecord":
         return cls(name=player.name, mode=mode, score=player.scores)
-
 
     def __eq__(self, other) -> bool:
         return self.name == other.name and self.mode == other.mode
@@ -19,7 +22,7 @@ class PlayerRecord:
         return self.score > other.score
 
     def __str__(self) -> str:
-        return f"{self.name} {self.mode} {self.score}"
+        return f"{self.name},{self.mode},{self.score}"
 
 
 class GameRecord:
@@ -37,23 +40,19 @@ class GameRecord:
         self.records = self.records[:MAX_RECORDS_NUMBER]
 
 
+def get_filename() -> str:
+    return SCORE_FILE
+
+
 class ScoreHandler:
     def __init__(self) -> None:
         self.game_record = GameRecord()
-        self.file_name = SCORE_FILE
+        self.file_name = get_filename()
         self.read()
 
     def read(self) -> None:
-        try:
-            with open(self.file_name, 'r') as file:
-                for line in file:
-                    data = line.strip().split(',')
-                    name, mode, score = data[0], data[1], int(data[2])
-                    self.game_record.add_record(PlayerRecord(name, mode, score))
-        except FileNotFoundError:
-            open(self.file_name, "w").close()
-        except IndexError:
-            self.game_record.add_record(PlayerRecord())
+        self.checking_file_existence()
+        self.read_file()
 
     def save(self) -> None:
         self.game_record.prepare_records()
@@ -65,5 +64,17 @@ class ScoreHandler:
         for record in self.game_record.records:
             print(f"{record}")
 
-    def add_record(self, record: PlayerRecord) -> None:
+    def add_rec(self, record: PlayerRecord) -> None:
         self.game_record.add_record(record)
+
+    def read_file(self) -> None:
+        with open(self.file_name, 'r') as file:
+            for line in file:
+                data = line.strip().split(',')
+                name, mode, score = data[0], data[1], int(data[2])
+                self.game_record.add_record(PlayerRecord(name, mode, score))
+
+    def checking_file_existence(self) -> None:
+        file_path = os.path.join(os.getcwd(), self.file_name)
+        if not os.path.exists(file_path):
+            open(self.file_name, "w").close()

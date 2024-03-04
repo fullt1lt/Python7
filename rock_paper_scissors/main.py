@@ -13,7 +13,6 @@ def create_player() -> tuple:
         except KeyError:
             print("Incorrect select entered") 
 
-
 def play_game() -> None:
     player, mode = create_player()
     game = Game(player, mode)

@@ -41,7 +41,7 @@ class Game:
         enemy_move = self.enemy.select_attack()
         return ATTACK_PAIRS_OUTCOME[player_move,enemy_move]
 
-    def handle_fight_result (self, result: int)-> None:
+    def handle_fight_result (self, result: int) -> None:
         if result == WIN:
             self.win()
         elif result == LOSE:
@@ -65,5 +65,5 @@ class Game:
 
     def save_results(self) -> None:
         handler = ScoreHandler()
-        handler.add_record(PlayerRecord.from_player_and_mode(self.player, self.mode))
+        handler.add_rec(PlayerRecord.from_player_and_mode(self.player, self.mode))
         handler.save()
