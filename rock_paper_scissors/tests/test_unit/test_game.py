@@ -1,9 +1,9 @@
 from unittest import TestCase
-
+from unittest.mock import patch
 from game.models import Enemy, Player
-from game.settings import ATTACK_PAIRS_OUTCOME, ENEMY_LIVES, FIGHT, KILL, LOSE, MODE_HARD, MODE_NORMAL,ALLOWED_ATTACKS, PLAYER_LIVES, POINTS_FOR_FIGHT, POINTS_FOR_FIGHT_FOR_MODE_HARD, POINTS_FOR_KILLING, POINTS_FOR_KILLING_FOR_MODE_HARD, WIN
+from game.settings import ATTACK_PAIRS_OUTCOME, DRAW, ENEMY_LIVES, FIGHT, KILL, LOSE, MODE_HARD, MODE_NORMAL,ALLOWED_ATTACKS, PLAYER_LIVES, POINTS_FOR_FIGHT, POINTS_FOR_FIGHT_FOR_MODE_HARD, POINTS_FOR_KILLING, POINTS_FOR_KILLING_FOR_MODE_HARD, WIN
 from game.game import Game
-from game.exeptions import IncorrectModeError, IncorrectScoresAddingType
+from game.exeptions import GameOver, IncorrectModeError, IncorrectScoresAddingType
 from itertools import product
 
 class TestGameInit(TestCase):
@@ -79,21 +79,80 @@ class TestAddScores(TestCase):
             game.add_scores("Test")
 
 
+class TestWin(TestCase):
+    
+    def setUp(self) -> None:
+       self.player = Player('test_name', MODE_NORMAL)
+       self.game = Game(self.player, MODE_NORMAL)
+    
+    def test_win(self) -> None:
+        self.game.win()
+        self.assertEqual(self.player.scores, POINTS_FOR_FIGHT)
+        self.assertEqual(self.game.enemy.lives, ENEMY_LIVES - 1)
+        
+class TestLose(TestCase):
+    
+    def setUp(self) -> None:
+       self.player = Player('test_name', MODE_NORMAL)
+       self.game = Game(self.player, MODE_NORMAL)
+    
+    def test_lose(self) -> None:
+        self.game.lose()
+        self.assertEqual(self.player.lives, PLAYER_LIVES - 1)
+        
+class TestDraw(TestCase):
+    
+    def setUp(self) -> None:
+       self.player = Player('test_name', MODE_NORMAL)
+       self.game = Game(self.player, MODE_NORMAL)
+       
+    def test_darw(self) -> None:
+        self.assertEqual(self.player.scores, 0)
+        self.assertEqual(self.game.enemy.lives, ENEMY_LIVES)
+        self.assertEqual(self.player.lives, PLAYER_LIVES)
+
 class TestHandleFightResult(TestCase):
 
     def setUp(self) -> None:
        self.player = Player('test_name', MODE_NORMAL)
        self.game = Game(self.player, MODE_NORMAL)
 
-    def test_win(self) -> None:
+    def test_handle_fight_result_win(self) -> None:
         self.game.handle_fight_result(WIN)
         self.assertEqual(self.player.scores, POINTS_FOR_FIGHT)
         self.assertEqual(self.game.enemy.lives, ENEMY_LIVES - 1)
-
-    def test_lose(self) -> None:
+        
+    def test_handle_fight_result_lose(self) -> None:
         self.game.handle_fight_result(LOSE)
         self.assertEqual(self.player.lives, PLAYER_LIVES - 1)
+        
+    def test_handle_fight_result_draw(self) -> None:
+        self.game.handle_fight_result(DRAW)
+        self.assertEqual(self.player.scores, 0)
+        self.assertEqual(self.game.enemy.lives, ENEMY_LIVES)
+        self.assertEqual(self.player.lives, PLAYER_LIVES)
 
 
 # class TestPlay(TestCase):
-#     pass 
+    
+#     def setUp(self) -> None:
+#         self.player = Player('test_name', MODE_NORMAL)
+#         self.game = Game(self.player, MODE_NORMAL)
+
+#     @patch('builtins.print')
+#     @patch.object(Player, 'select_attack')
+#     @patch.object(Player, 'decrease_lives')
+#     @patch.object(Enemy, 'select_attack')
+#     @patch.object(Game, 'handle_fight_result')
+#     @patch.object(Game, 'create_enemy')
+#     @patch.object(Game, 'add_scores')
+#     def test_play_game_over(self, mock_add_scores, mock_create_enemy, mock_handle_fight_result, mock_enemy_select_attack, mock_player_select_attack, mock_print, mock_decrease_lives):
+#         mock_enemy_select_attack.return_value = "Stone"
+#         mock_player_select_attack.return_value = "Paper"
+#         mock_handle_fight_result.side_effect = GameOver
+
+#         with self.assertRaises(GameOver):
+#             self.game.play()
+
+#         mock_create_enemy.assert_not_called()
+#         mock_add_scores.assert_not_called()

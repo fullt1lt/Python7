@@ -2,4 +2,4 @@ Test,Hard,28
 Player1,Hard,24
 Daniil,Normal,13
 Daniil,Hard,11
-Player1,Normal,4
+John,Normal,10

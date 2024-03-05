@@ -2,7 +2,7 @@ from unittest import TestCase
 from unittest.mock import patch
 from game.models import Player
 from game.scores import PlayerRecord, ScoreHandler, get_filename, GameRecord
-from game.settings import MODE_NORMAL, SCORE_FILE
+from game.settings import MODE_HARD, MODE_NORMAL, SCORE_FILE
 import os
 
 
@@ -28,6 +28,7 @@ class TestAddRec(TestCase):
     @patch("game.scores.get_filename", return_value='test_file.txt')
     def test_add_new_record(self, mock) -> None:
         sh = ScoreHandler()
+        sh.game_record.records = []
         sh.add_rec(self.player_record)
         self.assertEqual(sh.game_record.records, self.test_game_record)
 
@@ -56,7 +57,7 @@ class TestCheckingFileExistence(TestCase):
         date_after = self.read_test_file()
         self.assertEqual(data_before, date_after)
 
-    def read_test_file(self) -> list[tuple]:
+    def read_test_file(self) -> list:
         test_data = []
         with open(self.file_test_name, 'r') as file:
             for line in file:
@@ -136,3 +137,33 @@ class TestRead(TestCase):
         self.reader.game_record.records = []
         self.reader.read()
         self.comparison_of_records()# сравнение пустых тестовых данных с records
+        
+        
+class TestSave(TestCase):
+    
+    def setUp(self) -> None:
+        self.test_data = [('John,Normal,10'),('Alice,Normal,5'),('Bob,Hard,2')]
+        self.test_file_name = 'test_file.txt'
+    
+    def read_test_file(self) -> list:
+        test_data = []
+        with open(self.test_file_name, 'r') as file:
+            for line in file:
+                test_data.append(line.strip())
+        return test_data
+    
+    def tearDown(self) -> None:
+        os.remove(self.test_file_name)
+    
+    @patch("game.scores.get_filename", return_value='test_file.txt')
+    def test_save_file(self, moke) -> None:
+        sh = ScoreHandler()
+        sh.game_record.records = []
+        sh.game_record.add_record(PlayerRecord("John", MODE_NORMAL, 10))
+        sh.game_record.add_record(PlayerRecord("Bob", MODE_HARD, 2))
+        sh.game_record.add_record(PlayerRecord("Alice", MODE_NORMAL, 5))
+        sh.save()
+        save_data = self.read_test_file()
+        self.assertEqual(len(save_data),len(self.test_data))
+        for save_item, test_item in zip(save_data, self.test_data):
+            self.assertEqual(save_item, test_item)

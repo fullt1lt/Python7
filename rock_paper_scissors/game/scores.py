@@ -13,6 +13,7 @@ class PlayerRecord:
 
     @classmethod
     def from_player_and_mode(cls, player: Player, mode : str) -> "PlayerRecord":
+        validate_mode(mode)
         return cls(name=player.name, mode=mode, score=player.scores)
 
     def __eq__(self, other) -> bool:
